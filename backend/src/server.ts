@@ -2,6 +2,7 @@ import fastifyJwt from '@fastify/jwt'
 import fastify from 'fastify'
 import  { z  } from 'zod'
 import bcrypt from 'bcryptjs'
+import {prisma} from './lib/prisma'
 
 
 
@@ -26,17 +27,29 @@ app.post('/login', async (request, reply) => {
 
   const { email, password } = loginBodySchema.parse (request.body)
 
-  if (email === 'admin@email.com' && password === 'admin@') {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    }
+  })
+
+  if (!user) {
+    return reply.status(401).send({ error: 'Credentials incorrect' })
+  }
+
+  const doesPasswordMatch = await bcrypt.compare(password, user.password_hash)
+
+  if (!doesPasswordMatch) {
+    return reply.status(401).send({ error: 'Credentials incorrect' })
+  }
+  
     const token = await reply.jwtSign({}, {
       sign: {
-        sub:'123456789',
+        sub:user.id,
         
       }
     })
     return reply.status(200).send({ token })
-  } else {
-      return reply.status(401).send({ error: 'Credentials incorrect' })
-  }
 })
 
 // Register
@@ -45,20 +58,37 @@ app.post('/register', async (request, reply) => {
   const registerBodySchema = z.object({
     name: z.string().min(3),
     email: z.string().email(),
-    password: z.string().min(6).regex(/^[a-zA-Z0-9_]*$/),
+    password: z.string().min(6).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
+    message: "Senha muito fraca! Precisa de maiúscula, minúscula, número e símbolo."
+  })
+
   })
   const { name, email, password } = registerBodySchema.parse (request.body)
 
-  if (email === 'admin@email.com') {
-    return reply.status(400).send({ error: 'Email already exists' })
+    
+
+  const userAlreadyExists = await prisma.user.findUnique({
+    where: {
+      email: email,
+    }
+  })
+
+  if (userAlreadyExists) {
+    return reply.status(400).send({error: 'Email already exists'})
   }
 
-  const passwordHash = await bcrypt.hash(password, 8)  
+  const passwordHash = await bcrypt.hash(password, 8)
+
+  await prisma.user.create({
+    data: {
+      name,
+      email,
+      password_hash: passwordHash,
+    }
+  })
 
   return reply.status(201).send()
 })
-    
-    
     
 
 const start = async () => {
