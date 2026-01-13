@@ -1,62 +1,92 @@
+import { Suspense } from "react";
 import FinTrackLogo from "@/components/icons/FinTrackLogo";
+import FloatingShapes from "@/components/3d/FloatingShapes";
+import { TrendingUp, Shield, Zap } from "lucide-react";
 
 const LoginHero = () => {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 rounded-3xl overflow-hidden p-8 flex flex-col">
-      {/* Large decorative F */}
-      <div className="flex-1 flex items-center justify-center relative">
-        <div className="relative">
-          <span className="text-[18rem] font-bold text-neutral-800 select-none leading-none">
-            F
-          </span>
-        </div>
-        
-        {/* Diamond accent */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-4">
-          <div className="w-6 h-6 bg-gradient-to-br from-amber-400 to-amber-600 rotate-45 shadow-lg shadow-amber-500/20" />
-        </div>
-      </div>
+    <div className="relative w-full h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl overflow-hidden flex flex-col">
+      {/* 3D Background */}
+      <Suspense fallback={null}>
+        <FloatingShapes />
+      </Suspense>
+
+      {/* Gradient overlays */}
+      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-transparent to-neutral-950/50 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/60 to-transparent z-10" />
 
       {/* Content */}
-      <div className="relative z-10 mt-auto">
-        <FinTrackLogo variant="light" size="sm" className="mb-4" />
-        
-        <h2 className="text-2xl font-bold text-white mb-3">
-          Welcome to FinTrack
-        </h2>
-        <p className="text-neutral-400 text-sm leading-relaxed max-w-md mb-2">
-          FinTrack helps you build organized and well coded dashboards full of beautiful and rich modules. Join us and start building your application today.
-        </p>
-        <p className="text-neutral-500 text-sm">
-          More than 17k people joined us, it's your turn
-        </p>
+      <div className="relative z-20 h-full flex flex-col p-8">
+        {/* Logo */}
+        <div className="animate-fade-in">
+          <FinTrackLogo variant="light" size="sm" />
+        </div>
 
-        {/* Feature card */}
-        <div className="mt-6 bg-neutral-800/80 backdrop-blur-sm rounded-2xl p-5 max-w-sm border border-neutral-700/50">
-          <h3 className="text-white font-semibold text-lg mb-2">
-            Get your right job and right place apply now
-          </h3>
-          <p className="text-neutral-400 text-sm mb-4">
-            Be among the first founders to experience the easiest way to start run a business.
+        {/* Main text */}
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-500/20 text-blue-400 rounded-full mb-6 border border-blue-500/30">
+              🚀 De volta ao controle
+            </span>
+          </div>
+
+          <h2
+            className="text-5xl font-bold text-white mb-4 leading-tight animate-fade-in"
+            style={{ animationDelay: "0.2s" }}
+          >
+            Seus dados
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-600 bg-clip-text text-transparent">
+              centralizados
+            </span>
+          </h2>
+
+          <p
+            className="text-neutral-400 text-lg leading-relaxed max-w-sm animate-fade-in"
+            style={{ animationDelay: "0.3s" }}
+          >
+            Continue sua jornada financeira. Acesse seus relatórios, gerencie metas e conquiste sua liberdade.
           </p>
-          
-          {/* Avatar group */}
-          <div className="flex items-center">
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-neutral-800" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-neutral-800" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-neutral-800" />
-              <div className="w-8 h-8 rounded-full bg-neutral-700 border-2 border-neutral-800 flex items-center justify-center text-xs text-white font-medium">
-                +2
-              </div>
-            </div>
+        </div>
+
+        {/* Stats */}
+        <div
+          className="grid grid-cols-3 gap-4 mb-6 animate-fade-in"
+          style={{ animationDelay: "0.4s" }}
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">+15%</div>
+            <div className="text-xs text-neutral-500">Economia</div>
+          </div>
+          <div className="text-center border-x border-neutral-800">
+            <div className="text-2xl font-bold text-white">100%</div>
+            <div className="text-xs text-neutral-500">Seguro</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">24h</div>
+            <div className="text-xs text-neutral-500">Monitorado</div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div
+          className="flex gap-3 animate-fade-in"
+          style={{ animationDelay: "0.5s" }}
+        >
+          <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 backdrop-blur-sm rounded-full border border-neutral-700/50">
+            <TrendingUp className="w-4 h-4 text-blue-500" />
+            <span className="text-xs text-neutral-300">Inteligente</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 backdrop-blur-sm rounded-full border border-neutral-700/50">
+            <Shield className="w-4 h-4 text-indigo-500" />
+            <span className="text-xs text-neutral-300">Privado</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 backdrop-blur-sm rounded-full border border-neutral-700/50">
+            <Zap className="w-4 h-4 text-violet-500" />
+            <span className="text-xs text-neutral-300">Rápido</span>
           </div>
         </div>
       </div>
-
-      {/* Decorative lines */}
-      <div className="absolute bottom-20 right-10 w-32 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent rotate-45" />
-      <div className="absolute bottom-16 right-6 w-24 h-px bg-gradient-to-r from-transparent via-neutral-500/20 to-transparent rotate-45" />
     </div>
   );
 };
