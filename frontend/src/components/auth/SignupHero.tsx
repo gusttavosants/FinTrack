@@ -5,7 +5,7 @@ import { TrendingUp, Shield, Zap } from "lucide-react";
 
 const SignupHero = () => {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl overflow-hidden flex flex-col">
+    <div className="relative w-full h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl overflow-hidden flex flex-col shadow-2xl shadow-neutral-900/20 dark:shadow-white/10 ring-1 ring-neutral-900/5 dark:ring-white/10">
       {/* 3D Background */}
       <Suspense fallback={null}>
         <FloatingShapes />
@@ -29,8 +29,8 @@ const SignupHero = () => {
               ✨ Nova experiência financeira
             </span>
           </div>
-          
-          <h2 
+
+          <h2
             className="text-5xl font-bold text-white mb-4 leading-tight animate-fade-in"
             style={{ animationDelay: "0.2s" }}
           >
@@ -40,8 +40,8 @@ const SignupHero = () => {
               simplificadas
             </span>
           </h2>
-          
-          <p 
+
+          <p
             className="text-neutral-400 text-lg leading-relaxed max-w-sm animate-fade-in"
             style={{ animationDelay: "0.3s" }}
           >
@@ -50,7 +50,7 @@ const SignupHero = () => {
         </div>
 
         {/* Stats */}
-        <div 
+        <div
           className="grid grid-cols-3 gap-4 mb-6 animate-fade-in"
           style={{ animationDelay: "0.4s" }}
         >
@@ -69,7 +69,7 @@ const SignupHero = () => {
         </div>
 
         {/* Features */}
-        <div 
+        <div
           className="flex gap-3 animate-fade-in"
           style={{ animationDelay: "0.5s" }}
         >
