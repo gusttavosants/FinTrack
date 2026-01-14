@@ -72,9 +72,9 @@ const LoginForm = () => {
             <Label htmlFor="password" className="text-sm font-medium text-foreground">
               Senha
             </Label>
-            <a href="#" className="text-sm font-medium text-primary hover:underline transition-colors">
+            <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline transition-colors">
               Esqueceu a senha?
-            </a>
+            </Link>
           </div>
           <div className="relative group">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-foreground" />

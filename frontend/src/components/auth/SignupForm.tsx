@@ -215,7 +215,7 @@ const SignupForm = () => {
         style={{ animationDelay: "0.5s" }}
       >
         Já tem uma conta?{" "}
-        <Link to="/" className="text-foreground font-medium hover:underline">
+        <Link to="/login" className="text-foreground font-medium hover:underline">
           Entrar
         </Link>
       </p>
