@@ -93,3 +93,28 @@ model CardTransaction {
   
   @@map("card_transactions")
 }
+
+model BankConnection {
+  id              String    @id @default(uuid())
+  user_id         String
+  provider        String    // "pluggy", "brapi", "openbanking"
+  item_id         String    // ID da conexão na API externa
+  access_token    String?   // Token de acesso
+  status          String    // "connected", "error", "updating"
+  last_sync       DateTime?
+  created_at      DateTime  @default(now())
+  
+  user            User      @relation(fields: [user_id], references: [id])
+  
+  @@map("bank_connections")
+}
+
+model SyncLog {
+  id              String    @id @default(uuid())
+  connection_id   String
+  status          String    // "success", "error"
+  message         String?
+  synced_at       DateTime  @default(now())
+  
+  @@map("sync_logs")
+}
