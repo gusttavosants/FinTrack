@@ -1,5 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { loginBodySchema, registerBodySchema } from "../schemas/auth.schema";
+import {
+  loginBodySchema,
+  registerBodySchema,
+  forgotPasswordBodySchema,
+  resetPasswordBodySchema,
+} from "../schemas/auth.schema";
 import * as userService from "../services/user.service";
 
 export async function login(request: FastifyRequest, reply: FastifyReply) {
@@ -63,4 +68,31 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
 
   // 6. Retornar sucesso
   return reply.status(201).send();
+}
+
+export async function forgotPassword(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  const { email } = forgotPasswordBodySchema.parse(request.body);
+
+  // Criar token e enviar email se o usuário existir. Sempre retornamos 200 para não vazar existência.
+  await userService.createPasswordResetToken(email).catch(() => {});
+
+  return reply.status(200).send();
+}
+
+export async function resetPassword(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  const { token, password } = resetPasswordBodySchema.parse(request.body);
+
+  const success = await userService.resetPassword(token, password);
+
+  if (!success) {
+    return reply.status(400).send({ error: "Token inválido ou expirado" });
+  }
+
+  return reply.status(200).send();
 }
