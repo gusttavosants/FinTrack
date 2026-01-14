@@ -5,7 +5,7 @@ import { TrendingUp, Shield, Zap } from "lucide-react";
 
 const LoginHero = () => {
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl overflow-hidden flex flex-col">
+    <div className="relative w-full h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl overflow-hidden flex flex-col shadow-2xl shadow-neutral-900/20 dark:shadow-white/10 ring-1 ring-neutral-900/5 dark:ring-white/10">
       {/* 3D Background */}
       <Suspense fallback={null}>
         <FloatingShapes />
