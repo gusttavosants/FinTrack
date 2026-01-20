@@ -29,4 +29,8 @@ export class GetTransactionsDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
 }
