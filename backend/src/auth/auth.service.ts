@@ -1,14 +1,17 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
+import { User } from '../database/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
 
@@ -16,7 +19,7 @@ export class AuthService {
     const { name, email, password } = registerDto;
     const normalizedEmail = email.toLowerCase().trim();
 
-    const userAlreadyExists = await this.prisma.user.findUnique({
+    const userAlreadyExists = await this.usersRepository.findOne({
       where: { email: normalizedEmail },
     });
 
@@ -26,13 +29,13 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await this.prisma.user.create({
-      data: {
-        name,
-        email: normalizedEmail,
-        password_hash: passwordHash,
-      },
+    const user = this.usersRepository.create({
+      name,
+      email: normalizedEmail,
+      passwordHash,
     });
+
+    await this.usersRepository.save(user);
 
     return { message: 'Usuário criado com sucesso' };
   }
@@ -41,15 +44,19 @@ export class AuthService {
     const { email, password } = loginDto;
     const normalizedEmail = email.toLowerCase().trim();
 
-    const user = await this.prisma.user.findUnique({
+    const user = await this.usersRepository.findOne({
       where: { email: normalizedEmail },
+      select: {
+        id: true,
+        passwordHash: true,
+      },
     });
 
     if (!user) {
       throw new UnauthorizedException('Credenciais incorretas');
     }
 
-    const doesPasswordMatch = await bcrypt.compare(password, user.password_hash);
+    const doesPasswordMatch = await bcrypt.compare(password, user.passwordHash);
 
     if (!doesPasswordMatch) {
       throw new UnauthorizedException('Senha Incorreta');

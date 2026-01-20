@@ -7,7 +7,7 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().default(3333),
   JWT_SECRET: z.string().min(32),
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
