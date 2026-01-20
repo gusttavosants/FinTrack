@@ -1,38 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, Repository } from 'typeorm';
+import { Account } from '../database/entities/account.entity';
+import { Transaction } from '../database/entities/transaction.entity';
 
 @Injectable()
 export class AccountsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    @InjectRepository(Account)
+    private readonly accountsRepository: Repository<Account>,
+    @InjectRepository(Transaction)
+    private readonly transactionsRepository: Repository<Transaction>,
+  ) {}
 
   async findAccountByUserId(userId: string) {
-    return await this.prisma.account.findFirst({
+    return await this.accountsRepository.findOne({
       where: {
-        user_id: userId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
+        userId,
       },
     });
   }
 
   async getAccountBalance(accountId: string) {
-    const account = await this.prisma.account.findUnique({
-      where: {
-        id: accountId,
-      },
+    return await this.accountsRepository.findOne({
+      where: { id: accountId },
       select: {
         balance: true,
         currency: true,
       },
     });
-
-    return account;
   }
 
   async getAccountMetrics(
@@ -43,23 +39,20 @@ export class AccountsService {
     const start = startDate || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const end = endDate || new Date();
 
-    const transactions = await this.prisma.transaction.findMany({
+    const transactions = await this.transactionsRepository.find({
       where: {
-        account_id: accountId,
-        date: {
-          gte: start,
-          lte: end,
-        },
+        accountId,
+        date: Between(start, end),
       },
     });
 
     const totalIncome = transactions
       .filter((t) => t.type === 'income')
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+      .reduce((sum, t) => sum + Number(t.amount ?? 0), 0);
 
     const totalExpense = transactions
       .filter((t) => t.type === 'expense')
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+      .reduce((sum, t) => sum + Number(t.amount ?? 0), 0);
 
     const netBalance = totalIncome - totalExpense;
 

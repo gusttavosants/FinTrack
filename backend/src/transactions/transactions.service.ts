@@ -1,44 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, FindManyOptions, Repository } from 'typeorm';
+import { Transaction } from '../database/entities/transaction.entity';
+import { Account } from '../database/entities/account.entity';
 import { GetTransactionsDto } from './dto/get-transactions.dto';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    @InjectRepository(Transaction)
+    private readonly transactionsRepository: Repository<Transaction>,
+    @InjectRepository(Account)
+    private readonly accountsRepository: Repository<Account>,
+  ) {}
 
   async listTransactions(accountId: string, filters: GetTransactionsDto) {
     const { page = 1, limit = 10, type, category, startDate, endDate } = filters;
 
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      account_id: accountId,
+    const where: FindManyOptions<Transaction>['where'] = {
+      accountId,
+      ...(type ? { type } : {}),
+      ...(category ? { category } : {}),
     };
 
-    if (type) {
-      where.type = type;
-    }
-
-    if (category) {
-      where.category = category;
-    }
-
     if (startDate || endDate) {
-      where.date = {};
-      if (startDate) where.date.gte = new Date(startDate);
-      if (endDate) where.date.lte = new Date(endDate);
+      const start = startDate ? new Date(startDate) : new Date(0);
+      const end = endDate ? new Date(endDate) : new Date();
+      where['date'] = Between(start, end);
     }
 
-    const transactions = await this.prisma.transaction.findMany({
+    const [transactions, total] = await this.transactionsRepository.findAndCount({
       where,
       skip,
       take: limit,
-      orderBy: {
-        date: 'desc',
-      },
+      order: { date: 'DESC' },
     });
-
-    const total = await this.prisma.transaction.count({ where });
 
     return {
       transactions,
@@ -52,30 +50,33 @@ export class TransactionsService {
   }
 
   async getTransactionById(transactionId: string) {
-    return await this.prisma.transaction.findUnique({
-      where: {
-        id: transactionId,
+    return await this.transactionsRepository.findOne({
+      where: { id: transactionId },
+      relations: {
+        account: true,
       },
-      include: {
+      select: {
+        id: true,
+        type: true,
+        category: true,
+        amount: true,
+        description: true,
+        recipient: true,
+        date: true,
         account: {
-          select: {
-            account_number: true,
-            user_id: true,
-          },
+          accountNumber: true,
+          userId: true,
         },
       },
     });
   }
 
   async getExpensesByCategory(accountId: string, startDate: Date, endDate: Date) {
-    const transactions = await this.prisma.transaction.findMany({
+    const transactions = await this.transactionsRepository.find({
       where: {
-        account_id: accountId,
+        accountId,
         type: 'expense',
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
+        date: Between(startDate, endDate),
       },
       select: {
         category: true,
@@ -85,7 +86,7 @@ export class TransactionsService {
 
     const grouped = transactions.reduce((acc, transaction) => {
       const category = transaction.category;
-      const amount = Number(transaction.amount);
+      const amount = Number(transaction.amount ?? 0);
 
       if (!acc[category]) {
         acc[category] = 0;
@@ -111,21 +112,18 @@ export class TransactionsService {
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
 
-    const transactions = await this.prisma.transaction.findMany({
+    const transactions = await this.transactionsRepository.find({
       where: {
-        account_id: accountId,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
+        accountId,
+        date: Between(startDate, endDate),
       },
       select: {
         type: true,
         amount: true,
         date: true,
       },
-      orderBy: {
-        date: 'asc',
+      order: {
+        date: 'ASC',
       },
     });
 
