@@ -10,12 +10,16 @@ import {
     X,
     Bell,
     Search,
-    User
+    User,
+    Sun,
+    Moon,
+    Languages
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import FinTrackLogo from "@/components/icons/FinTrackLogo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTheme } from "@/components/theme-provider";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -31,7 +35,17 @@ const sidebarItems = [
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [language, setLanguage] = useState<'PT' | 'EN'>('PT');
     const location = useLocation();
+    const { theme, setTheme } = useTheme();
+
+    const toggleTheme = () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
+
+    const toggleLanguage = () => {
+        setLanguage(language === 'PT' ? 'EN' : 'PT');
+    };
 
     return (
         <div className="min-h-screen bg-background text-foreground flex">
@@ -100,7 +114,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+            <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
                 {/* Header */}
                 <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
@@ -121,7 +135,35 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        {/* Language Toggle */}
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={toggleLanguage}
+                            className="relative"
+                            title={language === 'PT' ? 'Mudar para Inglês' : 'Switch to Portuguese'}
+                        >
+                            <Languages className="h-5 w-5 text-muted-foreground" />
+                            <span className="absolute -bottom-1 -right-1 text-[10px] font-bold bg-primary text-primary-foreground rounded px-1">
+                                {language}
+                            </span>
+                        </Button>
+
+                        {/* Theme Toggle */}
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={toggleTheme}
+                            title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+                        >
+                            {theme === 'dark' ? (
+                                <Sun className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                            ) : (
+                                <Moon className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                            )}
+                        </Button>
+
                         <Button variant="ghost" size="icon" className="relative">
                             <Bell className="h-5 w-5 text-muted-foreground" />
                             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500" />
@@ -129,7 +171,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
                         <div className="flex items-center gap-3 pl-4 border-l border-border">
                             <div className="text-right hidden md:block">
-                                <p className="text-sm font-medium">Iago Lima</p>
+                                <p className="text-sm font-medium text-foreground">Iago Lima</p>
                                 <p className="text-xs text-muted-foreground">Admin</p>
                             </div>
                             <Avatar>
@@ -141,7 +183,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-auto p-6 lg:p-8">
+                <main className="flex-1 p-6 lg:p-8">
                     <div className="mx-auto max-w-7xl animate-fade-in">
                         {children}
                     </div>

@@ -1,21 +1,40 @@
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import FinTrackLogo from "@/components/icons/FinTrackLogo";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempt:", { email, password, rememberMe });
+    setIsLoading(true);
+
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+      toast.success("Login realizado com sucesso!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error(error);
+      const message = error.response?.data?.message || "Erro ao realizar login";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,6 +79,7 @@ const LoginForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-12 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+              required
             />
           </div>
         </div>
@@ -85,6 +105,7 @@ const LoginForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-12 pr-12 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+              required
             />
             <button
               type="button"
@@ -112,11 +133,18 @@ const LoginForm = () => {
 
         <Button
           type="submit"
+          disabled={isLoading}
           className="w-full h-12 text-base font-medium group animate-fade-in"
           style={{ animationDelay: "0.35s" }}
         >
-          Entrar
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              Entrar
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
       </form>
 

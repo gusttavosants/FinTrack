@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import FinTrackLogo from "@/components/icons/FinTrackLogo";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 const SignupForm = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,9 +23,37 @@ const SignupForm = () => {
     acceptTerms: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signup attempt:", formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("As senhas não coincidem");
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      toast.error("Você precisa aceitar os termos");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await api.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      toast.success("Conta criada com sucesso! Faça login para continuar.");
+      navigate("/login");
+    } catch (error: any) {
+      console.error(error);
+      const message = error.response?.data?.message || "Erro ao criar conta";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const updateField = (field: string, value: string | boolean) => {
@@ -39,13 +72,13 @@ const SignupForm = () => {
         </span>
       </div>
 
-      <h1 
+      <h1
         className="text-4xl font-bold text-foreground mb-2 animate-fade-in"
         style={{ animationDelay: "0.1s" }}
       >
         Criar conta
       </h1>
-      <p 
+      <p
         className="text-muted-foreground mb-8 animate-fade-in"
         style={{ animationDelay: "0.15s" }}
       >
@@ -53,7 +86,7 @@ const SignupForm = () => {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div 
+        <div
           className="space-y-2 animate-fade-in"
           style={{ animationDelay: "0.2s" }}
         >
@@ -69,11 +102,12 @@ const SignupForm = () => {
               value={formData.name}
               onChange={(e) => updateField("name", e.target.value)}
               className="pl-12 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+              required
             />
           </div>
         </div>
 
-        <div 
+        <div
           className="space-y-2 animate-fade-in"
           style={{ animationDelay: "0.25s" }}
         >
@@ -89,11 +123,12 @@ const SignupForm = () => {
               value={formData.email}
               onChange={(e) => updateField("email", e.target.value)}
               className="pl-12 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+              required
             />
           </div>
         </div>
 
-        <div 
+        <div
           className="grid grid-cols-2 gap-3 animate-fade-in"
           style={{ animationDelay: "0.3s" }}
         >
@@ -110,6 +145,7 @@ const SignupForm = () => {
                 value={formData.password}
                 onChange={(e) => updateField("password", e.target.value)}
                 className="pl-10 pr-10 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+                required
               />
               <button
                 type="button"
@@ -134,6 +170,7 @@ const SignupForm = () => {
                 value={formData.confirmPassword}
                 onChange={(e) => updateField("confirmPassword", e.target.value)}
                 className="pl-10 pr-10 h-12 bg-muted/30 border-input transition-all focus:bg-muted/50 focus:scale-[1.01]"
+                required
               />
               <button
                 type="button"
@@ -146,7 +183,7 @@ const SignupForm = () => {
           </div>
         </div>
 
-        <div 
+        <div
           className="flex items-start space-x-2 animate-fade-in"
           style={{ animationDelay: "0.35s" }}
         >
@@ -168,17 +205,24 @@ const SignupForm = () => {
           </Label>
         </div>
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
+          disabled={isLoading}
           className="w-full h-12 text-base font-medium group animate-fade-in"
           style={{ animationDelay: "0.4s" }}
         >
-          Criar conta
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              Criar conta
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
       </form>
 
-      <div 
+      <div
         className="mt-6 animate-fade-in"
         style={{ animationDelay: "0.45s" }}
       >
@@ -210,7 +254,7 @@ const SignupForm = () => {
         </div>
       </div>
 
-      <p 
+      <p
         className="mt-6 text-sm text-center text-muted-foreground animate-fade-in"
         style={{ animationDelay: "0.5s" }}
       >
