@@ -6,12 +6,12 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
 export class TransactionsController {
-  constructor(private transactionsService: TransactionsService) {}
+  constructor(private transactionsService: TransactionsService) { }
 
   @Get()
   async listTransactions(
     @Query() filters: GetTransactionsDto,
-    @Param('accountId') accountId: string,
+    @Query('accountId') accountId: string,
   ) {
     return this.transactionsService.listTransactions(accountId, filters);
   }
@@ -23,7 +23,7 @@ export class TransactionsController {
 
   @Get('analytics/expenses-by-category')
   async getExpensesByCategory(
-    @Param('accountId') accountId: string,
+    @Query('accountId') accountId: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
@@ -36,7 +36,7 @@ export class TransactionsController {
 
   @Get('analytics/monthly')
   async getMonthlyAnalysis(
-    @Param('accountId') accountId: string,
+    @Query('accountId') accountId: string,
     @Query('months') months?: number,
   ) {
     return this.transactionsService.getMonthlyAnalysis(accountId, months);

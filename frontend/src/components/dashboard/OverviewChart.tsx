@@ -1,16 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-    { name: 'Jan', income: 4000, expense: 2400 },
-    { name: 'Feb', income: 3000, expense: 1398 },
-    { name: 'Mar', income: 2000, expense: 9800 },
-    { name: 'Apr', income: 2780, expense: 3908 },
-    { name: 'May', income: 1890, expense: 4800 },
-    { name: 'Jun', income: 2390, expense: 3800 },
-    { name: 'Jul', income: 3490, expense: 4300 },
-];
-
-const OverviewChart = () => {
+const OverviewChart = ({ data }: { data: any[] }) => {
     return (
         <div className="bg-card p-6 rounded-2xl border border-border">
             <div className="flex items-center justify-between mb-6">
@@ -50,20 +40,22 @@ const OverviewChart = () => {
                             dataKey="name"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+                            tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+                            tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
                         />
                         <Tooltip
                             contentStyle={{
-                                backgroundColor: 'var(--card)',
-                                border: '1px solid var(--border)',
-                                borderRadius: '8px'
+                                backgroundColor: 'hsl(var(--card))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px',
+                                color: 'hsl(var(--foreground))'
                             }}
+                            labelStyle={{ color: 'hsl(var(--foreground))' }}
                         />
                         <Area
                             type="monotone"

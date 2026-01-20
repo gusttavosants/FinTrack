@@ -1,6 +1,6 @@
 import { Eye, Wifi } from "lucide-react";
 
-const CreditCard = () => {
+const CreditCard = ({ balance, cardHolder }: { balance?: number, cardHolder?: string }) => {
     return (
         <div className="relative h-56 w-full rounded-2xl p-6 text-white overflow-hidden shadow-xl transition-transform hover:scale-[1.02] duration-300">
             {/* Background Gradient */}
@@ -17,7 +17,9 @@ const CreditCard = () => {
                 <div className="flex justify-between items-start">
                     <div>
                         <p className="text-xs font-medium text-white/80 mb-1">Current Balance</p>
-                        <h3 className="text-3xl font-bold tracking-tight">$24,562.00</h3>
+                        <h3 className="text-3xl font-bold tracking-tight">
+                            {balance ? balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : "$0.00"}
+                        </h3>
                     </div>
                     <Wifi className="h-6 w-6 rotate-90 opacity-80" />
                 </div>
@@ -48,7 +50,7 @@ const CreditCard = () => {
                     <div className="flex justify-between items-end">
                         <div>
                             <p className="text-[10px] uppercase text-white/60 font-semibold mb-0.5">Card Holder</p>
-                            <p className="font-medium tracking-wide">IAGO LIMA</p>
+                            <p className="font-medium tracking-wide uppercase">{cardHolder || "VALUED MEMBER"}</p>
                         </div>
                         <div className="flex flex-col items-end">
                             <p className="text-[10px] uppercase text-white/60 font-semibold mb-0.5">Expires</p>

@@ -3,12 +3,20 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AccountsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAccountByUserId(userId: string) {
     return await this.prisma.account.findFirst({
       where: {
         user_id: userId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
   }

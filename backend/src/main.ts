@@ -14,6 +14,9 @@ async function bootstrap() {
     }),
   );
 
+  // Habilitar CORS para permitir requisições do frontend
+  app.enableCors();
+
   await app.listen(env.PORT, '0.0.0.0');
   console.log(`🚀 Server running on http://localhost:${env.PORT}`);
 }

@@ -4,7 +4,7 @@ import { GetTransactionsDto } from './dto/get-transactions.dto';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async listTransactions(accountId: string, filters: GetTransactionsDto) {
     const { page = 1, limit = 10, type, category, startDate, endDate } = filters;
